@@ -28,7 +28,7 @@ cobertura de pruebas ≥ 15 tests de modelo.
 |---|---|---|---|
 | 1 | Diseño diagrama ER (8 entidades) | ✅ W04 | 1:45 |
 | 2 | Normalización 3FN y decisiones de diseño | ✅ W04 | 1:45 |
-| 3 | Aprobación del asesor | ⏳ W04 | — |
+| 3 | Aprobación del asesor | ✅ W04 | — |
 | 4 | Implementar models.py × 5 apps | ⏳ W05 | — |
 | 5 | Ejecutar makemigrations + migrate | ⏳ W05 | — |
 | 6 | Registrar en admin.py | ⏳ W05 | — |
@@ -92,7 +92,7 @@ al repositorio para poder continuar con la guia
 
 ## 8. Aprobación formal del diagrama ER
 
-| Rol | Nombre | Fecha | Observaciones |
+| Rol | Nombre | Fecha | Observaciones |Aprobado ✅
 |---|---|---|---|
 | Desarrollador | [Derek] | | |
 | **Asesor (PO)** | **MC. Román Fernando López González** | | |
