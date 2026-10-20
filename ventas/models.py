@@ -13,9 +13,9 @@ Decisiones de diseño aplicadas:
     D-06: DetalleVenta.precio_unitario → almacenado (histórico).
 """
 from decimal import Decimal
-
+from django.core.validators import MinValueValidator
 from django.db import models
-
+from django.core.exceptions import ValidationError
 from clientes.models  import Cliente
 from productos.models import Producto
 
@@ -117,6 +117,16 @@ class DetalleVenta(models.Model):
             self.precio_unitario = self.producto.precio
         super().save(*args, **kwargs)
 
+    def clean(self) -> None:
+        """Validación de negocio para línea de detalle.
+
+        Raises:
+            ValidationError: si cantidad < 1.
+        """
+        if self.cantidad is not None and self.cantidad < 1:
+            raise ValidationError(
+                {'cantidad': 'La cantidad debe ser al menos 1.'}
+            )
 
 # ── Pedido ─────────────────────────────────────────────────────────────────
 
@@ -126,7 +136,17 @@ class Pedido(models.Model):
     Nota: se implementa en la Espiral 5 (W13–W15).
     Se define aquí para completar el esquema ER aprobado.
     """
+    def clean(self) -> None:
+        """Validación de negocio para línea de detalle.
 
+        Raises:
+            ValidationError: si cantidad < 1.
+        """
+        if self.cantidad is not None and self.cantidad < 1:
+            raise ValidationError(
+                {'cantidad': 'La cantidad debe ser al menos 1.'}
+            )
+        
     ESTADO_CHOICES = [
         ('pendiente',  'Pendiente de pago'),
         ('pagado',     'Pago confirmado'),
@@ -160,8 +180,11 @@ class Pedido(models.Model):
         null=True, blank=True, verbose_name='Fecha de entrega'
     )
     total_pagado  = models.DecimalField(
-        max_digits=10, decimal_places=2,
-        null=True, blank=True,
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(Decimal('0.00'))],  # ← agregar
         verbose_name='Total pagado'
     )
 
