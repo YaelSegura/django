@@ -83,7 +83,7 @@ USE_TZ        = True
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'static']
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 
 # ── Archivos media ────────────────────────────────────────────────────────
@@ -132,6 +132,9 @@ JAZZMIN_SETTINGS = {
     'usermenu_links': [
         {'name': 'Ver ERP', 'url': '/', 'new_window': False},
     ],
+
+    # Fix error 500 en producción: el UI builder pide 'vendor/bootswatch'
+    "show_ui_builder": False,
 
     # Menú lateral: orden de apps y modelos
     'order_with_respect_to': [
@@ -200,3 +203,7 @@ JAZZMIN_UI_TWEAKS = {
         'success':   'btn-success',
     },
 }
+
+# Fix error 500 en producción: si falta una entrada en el manifiesto de
+# estáticos, usar el nombre sin hash en vez de lanzar error
+WHITENOISE_MANIFEST_STRICT = False
