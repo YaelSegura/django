@@ -5,7 +5,7 @@ Lectura (W07): ListView y DetailView con select_related y paginación.
 Escritura (W08): CreateView, UpdateView y DeleteView con login.
 """
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.urls import reverse_lazy
 from django.views.generic import (
     CreateView, DeleteView, DetailView, ListView, UpdateView
@@ -86,7 +86,7 @@ class ProductoUpdateView(LoginRequiredMixin, UpdateView):
         return response
 
 
-class ProductoDeleteView(LoginRequiredMixin, DeleteView):
+class ProductoDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     """Confirmación y borrado de un producto.
 
     SOLO acepta POST. El template debe incluir
@@ -97,6 +97,8 @@ class ProductoDeleteView(LoginRequiredMixin, DeleteView):
     template_name = 'productos/eliminar.html'
     pk_url_kwarg  = 'producto_id'
     success_url   = reverse_lazy('productos:lista')
+    permission_required = 'productos.delete_producto'
+
 
     def form_valid(self, form):
         nombre   = self.object.nombre

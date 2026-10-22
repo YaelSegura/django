@@ -14,19 +14,22 @@ ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
 
 # ── Apps instaladas ───────────────────────────────────────────────────────
 INSTALLED_APPS = [
-    # Jazzmin PRIMERO — antes de django.contrib.admin
-    'jazzmin',                          # ← nueva línea, primera posición
-
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',        # ← requerido por allauth
     # Terceros
+    'allauth',                     # ← nuevo
+    'allauth.account',             # ← nuevo
+    'allauth.socialaccount',       # ← nuevo (para OAuth futuro)
     'rest_framework',
     'whitenoise.runserver_nostatic',
     # Apps del ERP
+    'core',
     'clientes',
     'proveedores',
     'productos',
@@ -44,6 +47,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',   # ← agregar al final
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -207,3 +211,19 @@ JAZZMIN_UI_TWEAKS = {
 # Fix error 500 en producción: si falta una entrada en el manifiesto de
 # estáticos, usar el nombre sin hash en vez de lanzar error
 WHITENOISE_MANIFEST_STRICT = False
+
+# ── DJANGO SITES (requerido por allauth) ──────────────────────────────────
+SITE_ID = 1
+
+# ── AUTHENTICATION BACKENDS ───────────────────────────────────────────────
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+# ── ALLAUTH ───────────────────────────────────────────────────────────────
+ACCOUNT_LOGIN_METHODS      = {'username'}
+ACCOUNT_EMAIL_REQUIRED     = False
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_LOGOUT_ON_GET      = True
+ACCOUNT_SESSION_REMEMBER   = True

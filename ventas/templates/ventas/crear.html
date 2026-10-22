@@ -15,12 +15,10 @@
         <div class="mb-4" style="margin-top:.5rem;">
             <label class="erp-label">{{ field.label }}</label>
             {{ field }}
-            {% if field.errors %}
-                {% for e in field.errors %}
-                    <p style="color:var(--clr-danger);font-size:.82rem;
-                              margin:.25rem 0 0;">{{ e }}</p>
-                {% endfor %}
-            {% endif %}
+            {% for e in field.errors %}
+                <p style="color:var(--clr-danger);font-size:.82rem;
+                          margin:.25rem 0 0;">{{ e }}</p>
+            {% endfor %}
         </div>
         {% endfor %}
     </div>
@@ -34,6 +32,17 @@
         <div class="mb-4" style="margin-top:.5rem;">
             <label class="erp-label">{{ field.label }}</label>
             {{ field }}
-            {% if field.errors %}
-                {% for e in field.errors %}
-                    <p style="color:var(--clr-danger);font-size:.82
+            {% for e in field.errors %}
+                <p style="color:var(--clr-danger);font-size:.82rem;
+                          margin:.25rem 0 0;">{{ e }}</p>
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn-erp-gold">Registrar venta</button>
+        <a href="{% url 'ventas:lista' %}" class="btn-erp-primary">Cancelar</a>
+    </div>
+</form>
+{% endblock %}

@@ -12,7 +12,7 @@ Resultado esperado:
 """
 from decimal import Decimal
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Permission, User
 from django.test import Client, TestCase
 from django.urls import reverse
 
@@ -28,6 +28,9 @@ class ProductoEscrituraTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(
             'testuser', password='testpass123'
+        )
+        self.user.user_permissions.add(
+            Permission.objects.get(codename='delete_producto')
         )
         self.cat  = Categoria.objects.create(nombre='Cat Test')
         self.prod = Producto.objects.create(
@@ -168,6 +171,9 @@ class VentaEscrituraTest(TestCase):
 
     def setUp(self):
         self.user = User.objects.create_user('userV', password='pass')
+        self.user.user_permissions.add(
+            Permission.objects.get(codename='add_venta')
+        )
         cat       = Categoria.objects.create(nombre='Cat')
         self.prod = Producto.objects.create(
             nombre='P', precio=Decimal('100.00'), stock=5, categoria=cat
