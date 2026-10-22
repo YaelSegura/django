@@ -111,11 +111,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # ── JAZZMIN — Personalización del admin con Fable 5 AzulERP ───────────────
 JAZZMIN_SETTINGS = {
     # Identidad
-    'site_title':       'ERP Django',
-    'site_header':      'ERP UTEC Celaya',
-    'site_brand':       '📦 ERP Django',
-    'welcome_sign':     'Bienvenido al Sistema ERP · UTEC Celaya',
-    'copyright':        'MC. Román Fernando López González · UTEC Celaya',
+        'site_title':       'YS Empire',
+    'site_header':      'YS Empire',
+    'site_brand':       '👑 YS Empire',
+    'welcome_sign':     'Bienvenido a YS Empire · tus gustos, nuestros productos',
+    'copyright':        'Yael Segura',
 
     # Icono del sitio (usar emoji como fallback)
     'site_icon':        None,
@@ -182,14 +182,14 @@ JAZZMIN_UI_TWEAKS = {
     'body_small_text':          False,
     'brand_small_text':         False,
     'brand_colour':             'navbar-dark',
-    'accent':                   'accent-navy',
+    'accent':                   'accent-purple',
     'navbar':                   'navbar-dark',
     'no_navbar_border':         False,
     'navbar_fixed':             True,
     'layout_boxed':             False,
     'footer_fixed':             False,
     'sidebar_fixed':            True,
-    'sidebar':                  'sidebar-dark-navy',
+    'sidebar':                  'sidebar-dark-purple',
     'sidebar_nav_small_text':   False,
     'sidebar_disable_expand':   False,
     'sidebar_nav_child_indent': True,
@@ -197,7 +197,7 @@ JAZZMIN_UI_TWEAKS = {
     'sidebar_nav_legacy_style': False,
     'sidebar_nav_flat_style':   False,
     'theme':                    'default',
-    'dark_mode_theme':          None,
+    'default_theme_mode':       'dark',
     'button_classes': {
         'primary':   'btn-primary',
         'secondary': 'btn-secondary',
