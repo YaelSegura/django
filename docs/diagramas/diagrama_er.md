@@ -1,6 +1,6 @@
 # Diagrama Entidad-Relación — ERP Django
 ## Espiral 2 · Aprobado por: MC. Román Fernando López González
-## Fecha de aprobación: ___/___/_____
+## Fecha de aprobación: 16/10/2026
 
 ```mermaid
 erDiagram

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#0A2342">
-    <title>{% block title %}ERP Django{% endblock %} · UTEC Celaya</title>
+    <title>{% block title %}Inicio{% endblock %} · YS Empire</title>
 
     <!-- Google Fonts: Playfair Display + Inter + JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,43 +18,43 @@
 
     <!-- Fable 5 AzulERP — Design System -->
     <style>
-        /* TOKENS MODO DÍA */
+        /* TOKENS YS EMPIRE — NEGRO PROFESIONAL (por defecto) */
         :root, [data-theme="light"] {
-            --clr-navy   : #0A2342;
-            --clr-royal  : #1B4F8A;
-            --clr-sky    : #4A90D9;
-            --clr-ice    : #E8F0FB;
-            --clr-gold   : #B8860B;
-            --clr-amber  : #D4A017;
-            --clr-cream  : #FDF8E8;
-            --clr-bg     : #F5F7FA;
-            --clr-surface: #FFFFFF;
-            --clr-text   : #1A1A2E;
-            --clr-muted  : #5A6A7E;
-            --clr-border : #C8D8EC;
-            --clr-danger : #C0392B;
-            --clr-ok     : #1A7A4A;
-            --shadow-sm  : 0 1px 4px rgba(10,35,66,.08);
-            --shadow-md  : 0 4px 16px rgba(10,35,66,.12);
+            --clr-navy   : #0f0f12;
+            --clr-royal  : #a78bfa;
+            --clr-sky    : #a78bfa;
+            --clr-ice    : #141417;
+            --clr-gold   : #8b5cf6;
+            --clr-amber  : #a78bfa;
+            --clr-cream  : #141417;
+            --clr-bg     : #09090b;
+            --clr-surface: #111113;
+            --clr-text   : #fafafa;
+            --clr-muted  : #a1a1aa;
+            --clr-border : #27272a;
+            --clr-danger : #ef4444;
+            --clr-ok     : #22c55e;
+            --shadow-sm  : 0 1px 2px rgba(0,0,0,.5);
+            --shadow-md  : 0 10px 30px rgba(0,0,0,.55);
         }
-        /* TOKENS MODO NOCHE */
+        /* TOKENS YS EMPIRE — NEGRO TOTAL (botón 🌙) */
         [data-theme="dark"] {
-            --clr-navy   : #1E3A5F;
-            --clr-royal  : #2E5F9E;
-            --clr-sky    : #6BAEE8;
-            --clr-ice    : #1A2A3A;
-            --clr-gold   : #D4AF37;
-            --clr-amber  : #E8C547;
-            --clr-cream  : #2A2510;
-            --clr-bg     : #0D1B2A;
-            --clr-surface: #142033;
-            --clr-text   : #E2EAF4;
-            --clr-muted  : #8AA0B8;
-            --clr-border : #2A3F58;
-            --clr-danger : #E74C3C;
-            --clr-ok     : #2ECC71;
-            --shadow-sm  : 0 1px 4px rgba(0,0,0,.3);
-            --shadow-md  : 0 4px 16px rgba(0,0,0,.4);
+            --clr-navy   : #050505;
+            --clr-royal  : #a78bfa;
+            --clr-sky    : #a78bfa;
+            --clr-ice    : #0d0d0d;
+            --clr-gold   : #8b5cf6;
+            --clr-amber  : #a78bfa;
+            --clr-cream  : #0d0d0d;
+            --clr-bg     : #000000;
+            --clr-surface: #0a0a0a;
+            --clr-text   : #fafafa;
+            --clr-muted  : #a1a1aa;
+            --clr-border : #1f1f22;
+            --clr-danger : #ef4444;
+            --clr-ok     : #22c55e;
+            --shadow-sm  : 0 1px 2px rgba(0,0,0,.6);
+            --shadow-md  : 0 10px 30px rgba(0,0,0,.7);
         }
         /* BASE */
         *, *::before, *::after { box-sizing: border-box; }
@@ -244,6 +244,374 @@
             padding: .75rem; border-top: 2px solid var(--clr-gold);
         }
     </style>
+    <!-- YS Empire — estilo profesional negro + morado -->
+    <style>
+        /* ── Tipografía limpia en todo el sitio ── */
+        body, .erp-brand, .erp-card-header, .erp-page-title h2 {
+            font-family: 'Inter', 'Segoe UI', sans-serif !important;
+        }
+        body { -webkit-font-smoothing: antialiased; }
+
+        /* ── Resplandor morado sutil en la parte superior ── */
+        body::before {
+            content: ""; position: fixed; top: -45vh; left: 50%;
+            width: 120vw; height: 85vh; transform: translateX(-50%);
+            background: radial-gradient(ellipse at center, rgba(124,58,237,.16), transparent 62%);
+            z-index: -1; pointer-events: none;
+            animation: ys-respirar 10s ease-in-out infinite;
+        }
+        @keyframes ys-respirar { 0%,100% { opacity: .55; } 50% { opacity: 1; } }
+
+        /* ── Animaciones base ── */
+        @keyframes ys-subir {
+            from { opacity: 0; transform: translateY(14px); }
+            to   { opacity: 1; transform: none; }
+        }
+        @keyframes ys-aparecer { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes ys-deslizar {
+            from { opacity: 0; transform: translateY(-10px); }
+            to   { opacity: 1; transform: none; }
+        }
+
+        /* Todo el contenido de la página entra escalonado */
+        .erp-main .container > * { animation: ys-subir .55s cubic-bezier(.2,.7,.2,1) both; }
+        .erp-main .container > *:nth-child(2) { animation-delay: .06s; }
+        .erp-main .container > *:nth-child(3) { animation-delay: .12s; }
+        .erp-main .container > *:nth-child(4) { animation-delay: .18s; }
+        .erp-main .container > *:nth-child(5) { animation-delay: .24s; }
+        .row > div { animation: ys-subir .55s cubic-bezier(.2,.7,.2,1) both; }
+        .row > div:nth-child(2) { animation-delay: .07s; }
+        .row > div:nth-child(3) { animation-delay: .14s; }
+        .row > div:nth-child(4) { animation-delay: .21s; }
+        .row > div:nth-child(5) { animation-delay: .28s; }
+        .row > div:nth-child(6) { animation-delay: .35s; }
+
+        /* ── Navbar fija con efecto vidrio ── */
+        .erp-navbar {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(9,9,11,.78);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--clr-border);
+            box-shadow: none; padding: .8rem 1.5rem;
+            animation: ys-deslizar .5s ease both;
+        }
+        .erp-brand {
+            color: #fafafa !important; font-weight: 700;
+            font-size: 1.15rem; letter-spacing: -.02em;
+        }
+        .erp-brand span { color: var(--clr-muted); font-weight: 400; font-size: .8em; }
+
+        /* Enlaces del menú con línea morada que se desliza */
+        .erp-nav-link {
+            position: relative; background: none !important;
+            color: #a1a1aa !important; transition: color .2s;
+        }
+        .erp-nav-link::after {
+            content: ""; position: absolute; left: .75rem; right: .75rem; bottom: .1rem;
+            height: 2px; border-radius: 2px; background: var(--clr-gold);
+            transform: scaleX(0); transform-origin: left;
+            transition: transform .28s cubic-bezier(.2,.7,.2,1);
+        }
+        .erp-nav-link:hover, .erp-nav-link.active { color: #fafafa !important; }
+        .erp-nav-link:hover::after, .erp-nav-link.active::after { transform: scaleX(1); }
+
+        .theme-toggle {
+            background: transparent; color: var(--clr-text);
+            border: 1px solid var(--clr-border);
+            transition: border-color .2s, transform .35s;
+        }
+        .theme-toggle:hover { border-color: var(--clr-gold); transform: rotate(25deg); }
+
+        /* ── Títulos de página ── */
+        .erp-page-title { border-bottom: 1px solid var(--clr-border); }
+        .erp-page-title h2, [data-theme="dark"] .erp-page-title h2 {
+            color: var(--clr-text) !important; font-weight: 700;
+            letter-spacing: -.02em;
+        }
+
+        /* ── Tarjetas ── */
+        .erp-card {
+            background: var(--clr-surface);
+            border: 1px solid var(--clr-border);
+            box-shadow: none;
+            transition: border-color .25s, box-shadow .25s, transform .25s;
+        }
+        .erp-card:hover { border-color: rgba(139,92,246,.45); box-shadow: var(--shadow-md); }
+        .erp-card-header {
+            background: transparent !important; color: var(--clr-text);
+            font-weight: 600; font-size: .95rem; letter-spacing: 0;
+            border-left: 3px solid var(--clr-gold);
+            border-bottom: 1px solid var(--clr-border);
+        }
+
+        /* ── Tablas ── */
+        .erp-table { border: 1px solid var(--clr-border); box-shadow: none; }
+        .erp-table thead th {
+            background: var(--clr-navy); color: var(--clr-muted);
+            font-weight: 500; font-size: .75rem;
+            border-bottom: 1px solid var(--clr-border);
+        }
+        .erp-table tbody td,
+        .erp-table tbody tr:nth-child(even) td {
+            background: var(--clr-surface);
+            border-bottom: 1px solid var(--clr-border);
+            transition: background .2s;
+        }
+        .erp-table tbody tr { animation: ys-aparecer .45s ease both; }
+        .erp-table tbody tr:nth-child(2)  { animation-delay: .04s; }
+        .erp-table tbody tr:nth-child(3)  { animation-delay: .08s; }
+        .erp-table tbody tr:nth-child(4)  { animation-delay: .12s; }
+        .erp-table tbody tr:nth-child(5)  { animation-delay: .16s; }
+        .erp-table tbody tr:nth-child(6)  { animation-delay: .20s; }
+        .erp-table tbody tr:nth-child(7)  { animation-delay: .24s; }
+        .erp-table tbody tr:nth-child(8)  { animation-delay: .28s; }
+        .erp-table tbody tr:nth-child(n+9){ animation-delay: .32s; }
+        .erp-table tbody tr:hover td { background: rgba(139,92,246,.07); }
+        .erp-table tbody tr:hover td:first-child { box-shadow: inset 2px 0 0 var(--clr-gold); }
+        .erp-table tfoot td {
+            background: var(--clr-navy); color: var(--clr-text);
+            border-top: 1px solid var(--clr-border);
+        }
+
+        /* ── Botones ── */
+        .btn-erp-gold, .btn-erp-primary, .btn-erp-danger {
+            border-radius: 8px; font-weight: 600;
+            transition: background .2s, border-color .2s, color .2s,
+                        transform .15s, box-shadow .2s;
+        }
+        .btn-erp-gold { background: var(--clr-gold); color: #fff; border: 1px solid transparent; }
+        .btn-erp-gold:hover {
+            background: var(--clr-amber); color: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(124,58,237,.35);
+        }
+        .btn-erp-primary { background: transparent; color: var(--clr-text); border: 1px solid #3f3f46; }
+        .btn-erp-primary:hover {
+            background: rgba(139,92,246,.08); border-color: var(--clr-gold);
+            color: #fff; transform: translateY(-1px);
+        }
+        .btn-erp-danger { background: transparent; color: #f87171; border: 1px solid rgba(239,68,68,.4); }
+        .btn-erp-danger:hover { background: #dc2626; border-color: #dc2626; color: #fff; }
+        .btn-erp-gold:active, .btn-erp-primary:active, .btn-erp-danger:active { transform: scale(.97); }
+
+        /* ── Formularios ── */
+        .erp-label { color: var(--clr-muted); font-weight: 500; font-size: .78rem; letter-spacing: .04em; }
+        .erp-input {
+            background: #0c0c0e; border: 1px solid var(--clr-border);
+            transition: border-color .2s, box-shadow .2s, background .2s;
+        }
+        .erp-input:hover { border-color: #3f3f46; }
+        .erp-input:focus {
+            background: #0f0f12; border-color: var(--clr-gold);
+            box-shadow: 0 0 0 3px rgba(139,92,246,.22);
+        }
+        .erp-input option { background: #111113; color: #fafafa; }
+
+        /* ── Badges y alertas ── */
+        .badge-erp-gold {
+            background: rgba(139,92,246,.12); color: #c4b5fd;
+            border: 1px solid rgba(139,92,246,.3);
+        }
+        .erp-alert-info {
+            background: var(--clr-surface); border: 1px solid var(--clr-border);
+            border-left: 3px solid var(--clr-gold);
+        }
+        .erp-alert-success, .erp-alert-danger { border-left-width: 3px; }
+        [role="alert"] { animation: ys-deslizar .4s ease both; }
+
+        code, .mono,
+        [data-theme="dark"] code, [data-theme="dark"] .mono {
+            color: #c4b5fd; background: rgba(139,92,246,.1);
+        }
+
+        /* ── Portada ── */
+        .ys-hero { text-align: center; padding: 3.5rem 0 2.5rem; }
+        .ys-eyebrow {
+            display: inline-block; font-size: .72rem; font-weight: 600;
+            letter-spacing: .18em; text-transform: uppercase; color: #c4b5fd;
+            border: 1px solid rgba(139,92,246,.35); background: rgba(139,92,246,.08);
+            padding: .35rem .95rem; border-radius: 999px;
+        }
+        .ys-titulo {
+            font-weight: 800; font-size: clamp(2.4rem, 6vw, 4.2rem);
+            letter-spacing: -.04em; line-height: 1.05; margin: 1.1rem 0 .8rem;
+            background: linear-gradient(180deg, #fafafa 35%, #a78bfa);
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+        }
+        .ys-subtitulo { color: var(--clr-muted); font-size: 1.1rem; margin: 0; }
+        .ys-cta { display: flex; gap: .75rem; justify-content: center; flex-wrap: wrap; margin-top: 1.75rem; }
+        .ys-cta a { padding: .65rem 1.4rem; font-size: .95rem; }
+
+        .ys-modulo { display: flex; align-items: center; gap: 1rem; cursor: pointer; margin-bottom: 0; }
+        .ys-modulo:hover { transform: translateY(-3px); }
+        .ys-modulo-icono {
+            width: 46px; height: 46px; flex-shrink: 0; border-radius: 10px;
+            display: grid; place-items: center; font-size: 1.3rem;
+            background: rgba(139,92,246,.1); border: 1px solid rgba(139,92,246,.25);
+            transition: transform .3s cubic-bezier(.2,.7,.2,1);
+        }
+        .ys-modulo:hover .ys-modulo-icono { transform: scale(1.08) rotate(-5deg); }
+        .ys-modulo-nombre { color: var(--clr-text); font-weight: 600; display: block; }
+        .ys-modulo-desc { color: var(--clr-muted); font-size: .85rem; }
+        .ys-flecha { margin-left: auto; color: var(--clr-muted); transition: transform .25s, color .25s; }
+        .ys-modulo:hover .ys-flecha { transform: translateX(4px); color: var(--clr-gold); }
+
+        /* ── Pie de página ── */
+        .erp-footer {
+            background: transparent; border-top: 1px solid var(--clr-border);
+            color: var(--clr-muted); padding: 1.25rem; font-size: .8rem;
+        }
+
+        /* ── Scrollbar y selección ── */
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: #09090b; }
+        ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #7c3aed; }
+        ::selection { background: rgba(139,92,246,.45); color: #fff; }
+
+        /* ── Accesibilidad: sin animaciones si el sistema lo pide ── */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation: none !important; transition: none !important; }
+        }
+    </style>
+    <style>
+        /* Fondo con brillos morados que flotan */
+        body::before {
+            content: ""; position: fixed; inset: -20%;
+            background:
+                radial-gradient(circle at 20% 30%, rgba(168,85,247,.18), transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(124,58,237,.15), transparent 45%);
+            animation: ys-flotar 18s ease-in-out infinite alternate;
+            z-index: -1; pointer-events: none;
+        }
+        @keyframes ys-flotar {
+            from { transform: translate(0, 0) rotate(0deg); }
+            to   { transform: translate(-4%, 3%) rotate(8deg); }
+        }
+
+        /* Navbar con efecto vidrio y línea de degradado en movimiento */
+        .erp-navbar {
+            position: relative; border-bottom: none;
+            background: rgba(10, 4, 20, .85);
+            backdrop-filter: blur(8px);
+        }
+        .erp-navbar::after {
+            content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 3px;
+            background: linear-gradient(90deg, #7c3aed, #c084fc, #a855f7, #7c3aed);
+            background-size: 300% 100%;
+            animation: ys-degradado 6s linear infinite;
+        }
+        @keyframes ys-degradado { to { background-position: 300% 0; } }
+
+        /* Marca con brillo pulsante */
+        .erp-brand { color: #e9d5ff !important; animation: ys-brillo 3s ease-in-out infinite; }
+        .erp-brand span { color: #c4b5fd; }
+        @keyframes ys-brillo {
+            0%, 100% { text-shadow: 0 0 6px rgba(168,85,247,.5); }
+            50%      { text-shadow: 0 0 18px rgba(192,132,252,.95); }
+        }
+        .erp-nav-link:hover, .erp-nav-link.active {
+            background: rgba(168,85,247,.25);
+            box-shadow: inset 0 -2px 0 #c084fc;
+        }
+
+        /* Títulos de página con brillo */
+        .erp-page-title h2, [data-theme="dark"] .erp-page-title h2 {
+            color: #e9d5ff;
+            text-shadow: 0 0 14px rgba(168,85,247,.55);
+        }
+
+        /* Tarjetas: aparecen subiendo y brillan al pasar el mouse */
+        .erp-card {
+            animation: ys-entrar .6s ease-out both;
+            transition: transform .25s, box-shadow .25s, border-color .25s;
+        }
+        .erp-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--clr-gold);
+            box-shadow: 0 0 0 1px var(--clr-gold), var(--shadow-md);
+        }
+        .row > div:nth-child(2) .erp-card { animation-delay: .08s; }
+        .row > div:nth-child(3) .erp-card { animation-delay: .16s; }
+        .row > div:nth-child(4) .erp-card { animation-delay: .24s; }
+        .row > div:nth-child(5) .erp-card { animation-delay: .32s; }
+        .row > div:nth-child(6) .erp-card { animation-delay: .40s; }
+        @keyframes ys-entrar {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: none; }
+        }
+        .erp-card-header {
+            background: linear-gradient(135deg, #2e1065, #1a0b2e);
+            border-left-color: var(--clr-gold);
+        }
+
+        /* Tablas */
+        .erp-table { animation: ys-entrar .6s ease-out both; }
+        .erp-table thead th {
+            background: linear-gradient(135deg, #2e1065, #1a0b2e);
+            border-bottom-color: var(--clr-gold);
+        }
+        .erp-table tbody tr:hover td { background: rgba(168,85,247,.14); }
+
+        /* Botones con destello al pasar el mouse */
+        .btn-erp-gold, .btn-erp-primary, .btn-erp-danger {
+            position: relative; overflow: hidden;
+            transition: transform .15s, box-shadow .25s;
+        }
+        .btn-erp-gold { color: #fff; border-color: #c084fc; }
+        .btn-erp-gold:hover, .btn-erp-primary:hover {
+            transform: translateY(-2px); color: #fff;
+            box-shadow: 0 0 16px rgba(168,85,247,.65);
+        }
+        .btn-erp-gold::after, .btn-erp-primary::after {
+            content: ""; position: absolute; top: 0; left: -75%;
+            width: 50%; height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255,255,255,.35), transparent);
+            transform: skewX(-20deg);
+        }
+        .btn-erp-gold:hover::after, .btn-erp-primary:hover::after {
+            animation: ys-destello .7s ease;
+        }
+        @keyframes ys-destello { to { left: 125%; } }
+
+        /* Inputs con brillo al enfocar */
+        .erp-input:focus {
+            border-color: var(--clr-gold);
+            box-shadow: 0 0 0 3px rgba(168,85,247,.3), 0 0 14px rgba(168,85,247,.35);
+        }
+        .erp-input option { background: #12091f; color: #ede9fe; }
+
+        /* Portada (bienvenida) */
+        .ys-hero {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.8rem; margin-bottom: .3rem;
+        }
+        .ys-icono { display: inline-block; animation: ys-levitar 3s ease-in-out infinite; }
+        @keyframes ys-levitar {
+            0%, 100% { transform: translateY(0); }
+            50%      { transform: translateY(-8px); }
+        }
+        .ys-texto {
+            background: linear-gradient(90deg, #c084fc, #a855f7, #f5d0fe, #c084fc);
+            background-size: 300% 100%;
+            -webkit-background-clip: text; background-clip: text;
+            color: transparent;
+            animation: ys-degradado 8s linear infinite;
+        }
+
+        /* Pie de página, scrollbar y selección */
+        .erp-footer { background: #07030d; border-top: 1px solid var(--clr-border); color: var(--clr-muted); }
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: #0a0a0f; }
+        ::-webkit-scrollbar-thumb { background: #4c1d95; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #7c3aed; }
+        ::selection { background: #7c3aed; color: #fff; }
+
+        /* Accesibilidad: sin animaciones si el sistema lo pide */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation: none !important; transition: none !important; }
+        }
+    </style>
     {% block extra_css %}{% endblock %}
 </head>
 
@@ -251,15 +619,15 @@
 
 <!-- NAVBAR -->
 <nav class="erp-navbar">
-    <a class="erp-brand" href="/">📦 ERP Django <span>· UTEC Celaya</span></a>
+    <a class="erp-brand" href="/">👑 YS Empire <span>· tus gustos, nuestros productos</span></a>
     <div class="erp-nav-links">
-        <a href="{% url 'productos:inicio' %}"
+        <a href="{% url 'productos:lista' %}"
            class="erp-nav-link {% block nav_productos %}{% endblock %}">Productos</a>
-        <a href="{% url 'clientes:inicio' %}"
+        <a href="{% url 'clientes:lista' %}"
            class="erp-nav-link {% block nav_clientes %}{% endblock %}">Clientes</a>
-        <a href="{% url 'proveedores:inicio' %}"
+        <a href="{% url 'proveedores:lista' %}"
            class="erp-nav-link {% block nav_proveedores %}{% endblock %}">Proveedores</a>
-        <a href="{% url 'ventas:inicio' %}"
+        <a href="{% url 'ventas:lista' %}"
            class="erp-nav-link {% block nav_ventas %}{% endblock %}">Ventas</a>
         <a href="{% url 'reportes:inicio' %}"
            class="erp-nav-link {% block nav_reportes %}{% endblock %}">Reportes</a>
@@ -298,7 +666,7 @@
 
 <!-- FOOTER -->
 <footer class="erp-footer">
-    ERP Django · Django 4.2 LTS · Fable 5 AzulERP · UTEC Celaya · Espiral 1
+    👑 YS Empire · tus gustos, nuestros productos · © 2026 Yael Segura
 </footer>
 
 <!-- Bootstrap JS -->
