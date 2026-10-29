@@ -1,19 +1,19 @@
 # productos/models.py
-"""Modelos de la app productos — Espiral 2 W05.
+"""Modelos de la app productos — Espiral 2 W05 + W11.
 
 Orden de implementación:
   1. Categoria  (sin FK)
-  2. Producto   (FK → Categoria, FK → Proveedor)  ← Parte 3
+  2. Producto   (FK → Categoria, FK → Proveedor)
 """
-# productos/models.py
 from decimal import Decimal
 
-from django.core.exceptions import ValidationError      # ← agregar
+from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
 
 from proveedores.models import Proveedor
 
+from .validators import validar_imagen_producto
 class Categoria(models.Model):
     """Categoría para clasificar productos del catálogo.
 
@@ -36,7 +36,7 @@ class Categoria(models.Model):
 
     def __str__(self) -> str:
         return self.nombre
-# Agregar después de la clase Categoria en productos/models.py
+
 
 class Producto(models.Model):
     """Artículo del inventario del ERP.
@@ -78,9 +78,18 @@ class Producto(models.Model):
     activo    = models.BooleanField(
         default=True, verbose_name='Activo'
     )
+    imagen    = models.ImageField(
+        upload_to='productos/',            # subcarpeta dentro de MEDIA_ROOT
+        null=True,
+        blank=True,
+        verbose_name='Imagen del producto',
+        help_text='Formatos: JPEG, PNG, WEBP. Máximo 5 MB.',
+        validators=[validar_imagen_producto],   # ← agregar
+    )
     creado    = models.DateTimeField(
         auto_now_add=True, verbose_name='Fecha de registro'
     )
+
     def clean(self) -> None:
         """Validaciones de negocio cruzadas para Producto.
 
@@ -106,10 +115,11 @@ class Producto(models.Model):
 
         if errors:
             raise ValidationError(errors)
+
     class Meta:
         verbose_name        = 'Producto'
         verbose_name_plural = 'Productos'
         ordering            = ['nombre']
 
     def __str__(self) -> str:
-        return f"{self.nombre} (${self.precio:.2f})"    
+        return f"{self.nombre} (${self.precio:.2f})"
