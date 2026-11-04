@@ -59,3 +59,28 @@ y generación de PDFs de facturas.
 | 8 tests de media pasando | ✅ W11 |
 | Generación PDF WeasyPrint | ⏳ W12 |
 | Exportación Excel openpyxl | ⏳ W12 |
+## Sprint Backlog — estado final W12
+
+| Tarea | Estado |
+|---|---|
+| Serializers + API Views + Token Auth | ✅ W10 |
+| ImageField + validador MIME + imagen_url + storages | ✅ W11 |
+| Factura en PDF (HU-E4-06) | ✅ W12 |
+| Exportación de inventario a Excel (HU-E4-07) | ✅ W12 |
+| 8 tests de documentos pasando | ✅ W12 |
+
+## Nota de desviación — motor de PDF
+
+La Guía W12 v2 establece WeasyPrint vía Docker como motor oficial.
+En el equipo de trabajo no hay Docker ni WSL2, y el asesor indicó que no
+se pueden instalar. Se usó **xhtml2pdf**, el motor de respaldo que la
+propia guía documenta. No se crearon Dockerfile, docker-entrypoint.sh
+ni docker-compose.yml, y render.yaml no se modificó.
+
+## Hito M4 — ALCANZADO ✅
+- API REST completa con autenticación por token
+- Imágenes de producto con validación MIME
+- Factura PDF descargable: /ventas/<id>/pdf/
+- Exportación a Excel: /productos/exportar-excel/
+- Tests acumulados: 131 → OK
+- Fecha: ___/___/_____

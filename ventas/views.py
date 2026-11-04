@@ -95,3 +95,72 @@ class VentaDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
         response = super().form_valid(form)
         messages.success(self.request, f'Venta #{pk} eliminada.')
         return response
+
+# ── Factura en PDF — W12 (motor: xhtml2pdf) ───────────────────────────────
+import os
+from datetime import date
+from decimal import Decimal, ROUND_HALF_UP
+from io import BytesIO
+
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
+from django.template.loader import render_to_string
+
+
+def _resolver_ruta_media(uri, rel):
+    """Convierte /media/... en ruta de disco para que xhtml2pdf cargue imágenes."""
+    if uri.startswith(settings.MEDIA_URL):
+        return os.path.join(settings.MEDIA_ROOT, uri[len(settings.MEDIA_URL):])
+    return uri
+
+
+@login_required
+def venta_pdf(request, venta_id: int) -> HttpResponse:
+    """Genera y descarga la factura de una venta en PDF.
+
+    Motor: xhtml2pdf (WeasyPrint/Docker no disponible en el equipo).
+
+    Raises:
+        Http404: si la venta no existe.
+    """
+    from xhtml2pdf import pisa
+    from configuracion.models import ConfiguracionERP
+
+    venta = get_object_or_404(
+        Venta.objects
+        .select_related('cliente')
+        .prefetch_related('detalles__producto'),
+        pk=venta_id
+    )
+    config = ConfiguracionERP.get_instance()
+
+    centavo      = Decimal('0.01')
+    subtotal     = venta.total
+    iva          = (subtotal * config.iva_porcentaje / Decimal('100')).quantize(
+        centavo, rounding=ROUND_HALF_UP
+    )
+    total_con_iva = subtotal + iva
+
+    html = render_to_string('ventas/factura_pdf.html', {
+        'venta':         venta,
+        'config':        config,
+        'hoy':           date.today(),
+        'subtotal':      subtotal,
+        'iva':           iva,
+        'total_con_iva': total_con_iva,
+    })
+
+    buffer    = BytesIO()
+    resultado = pisa.CreatePDF(
+        src=html, dest=buffer, link_callback=_resolver_ruta_media
+    )
+    if resultado.err:
+        return HttpResponse('No se pudo generar el PDF.', status=500)
+
+    respuesta = HttpResponse(buffer.getvalue(), content_type='application/pdf')
+    respuesta['Content-Disposition'] = (
+        f'attachment; filename="factura_{venta.pk:05d}.pdf"'
+    )
+    return respuesta    

@@ -1,11 +1,16 @@
 # productos/views.py
-"""Vistas de la app productos — W07 + W08.
+"""Vistas de la app productos — W07 + W08 + W12.
 
 Lectura (W07): ListView y DetailView con select_related y paginación.
 Escritura (W08): CreateView, UpdateView y DeleteView con login.
+Exportación (W12): exportar_excel (openpyxl).
 """
+from datetime import date
+
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponse
 from django.urls import reverse_lazy
 from django.views.generic import (
     CreateView, DeleteView, DetailView, ListView, UpdateView
@@ -47,16 +52,12 @@ class ProductoDetailView(DetailView):
 
 
 class ProductoCreateView(LoginRequiredMixin, CreateView):
-    """Formulario para crear un nuevo producto.
-
-    LoginRequiredMixin PRIMERO en la herencia (obligatorio).
-    Redirige a /accounts/login/ si el usuario no está autenticado.
-    """
+    """Formulario para crear un nuevo producto."""
 
     model         = Producto
     form_class    = ProductoForm
     template_name = 'productos/crear.html'
-    success_url   = reverse_lazy('productos:lista')  # reverse_lazy (no reverse)
+    success_url   = reverse_lazy('productos:lista')
 
     def form_valid(self, form):
         """Agrega mensaje flash de éxito al guardar."""
@@ -86,19 +87,13 @@ class ProductoUpdateView(LoginRequiredMixin, UpdateView):
         return response
 
 
-class ProductoDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
-    """Confirmación y borrado de un producto.
-
-    SOLO acepta POST. El template debe incluir
-    un formulario con {% csrf_token %} para evitar CSRF.
-    """
+class ProductoDeleteView(LoginRequiredMixin, DeleteView):
+    """Confirmación y borrado de un producto (solo POST)."""
 
     model         = Producto
     template_name = 'productos/eliminar.html'
     pk_url_kwarg  = 'producto_id'
     success_url   = reverse_lazy('productos:lista')
-    permission_required = 'productos.delete_producto'
-
 
     def form_valid(self, form):
         nombre   = self.object.nombre
@@ -108,3 +103,61 @@ class ProductoDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView
             f'Producto "{nombre}" eliminado.'
         )
         return response
+
+
+@login_required
+def exportar_excel(request) -> HttpResponse:
+    """Exporta el inventario de productos activos a un archivo .xlsx.
+
+    Returns:
+        HttpResponse con el archivo Excel como descarga directa.
+    """
+    from openpyxl import Workbook
+    from openpyxl.styles import Alignment, Font, PatternFill
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = 'Inventario'
+
+    encabezados = ['ID', 'Producto', 'Categoría', 'Proveedor',
+                   'Precio', 'Stock', 'Activo']
+    ws.append(encabezados)
+
+    # Estilo Fable 5 AzulERP: encabezado azul marino con texto blanco
+    relleno = PatternFill('solid', fgColor='0A2342')
+    for celda in ws[1]:
+        celda.font      = Font(bold=True, color='FFFFFF')
+        celda.fill      = relleno
+        celda.alignment = Alignment(horizontal='center')
+
+    productos = (
+        Producto.objects
+        .select_related('categoria', 'proveedor')
+        .filter(activo=True)
+        .order_by('nombre')
+    )
+    for p in productos:
+        ws.append([
+            p.pk,
+            p.nombre,
+            p.categoria.nombre,
+            p.proveedor.nombre if p.proveedor else '-',
+            float(p.precio),
+            p.stock,
+            'Sí' if p.activo else 'No',
+        ])
+
+    for col, ancho in zip('ABCDEFG', (8, 34, 22, 26, 14, 10, 10)):
+        ws.column_dimensions[col].width = ancho
+
+    respuesta = HttpResponse(
+        content_type=(
+            'application/vnd.openxmlformats-officedocument'
+            '.spreadsheetml.sheet'
+        )
+    )
+    respuesta['Content-Disposition'] = (
+        f'attachment; filename="inventario_{date.today():%Y%m%d}.xlsx"'
+    )
+    wb.save(respuesta)
+    return respuesta

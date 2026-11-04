@@ -1,5 +1,5 @@
 # productos/urls.py
-"""URLs de la app productos — W08 (CRUD completo)."""
+"""URLs de la app productos — W07 + W08 + W12."""
 from django.urls import path
 from . import views
 
@@ -23,4 +23,8 @@ urlpatterns = [
     path('<int:producto_id>/eliminar/',
          views.ProductoDeleteView.as_view(),
          name='eliminar'),
+    # Exportación a Excel (W12)
+    path('exportar-excel/',
+         views.exportar_excel,
+         name='exportar_excel'),
 ]

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Factura {{ venta.pk }}</title>
+<style>
+    @page {
+        size: A4 portrait;
+        margin: 2cm 2cm 2.5cm 2cm;
+        @frame footer_frame {
+            -pdf-frame-content: footer_content;
+            left: 2cm; width: 17cm; top: 27.4cm; height: 1cm;
+        }
+    }
+    body { font-family: Helvetica, Arial, sans-serif; font-size: 10pt; color: #1A1A2E; }
+    table { border-collapse: collapse; }
+    .cabecera { width: 100%; background-color: #0A2342; color: #FFFFFF; }
+    .cabecera td { padding: 10px 12px; }
+    .titulo { font-size: 20pt; font-weight: bold; color: #B8860B; }
+    .empresa { font-size: 9pt; color: #DDE6F3; }
+    .folio { font-size: 14pt; font-weight: bold; color: #B8860B; text-align: right; }
+    .datos { width: 100%; margin-top: 14px; }
+    .datos td { padding: 4px 8px; border: 1px solid #E8F0FB; font-size: 9pt; }
+    .datos td.lbl { background-color: #E8F0FB; font-weight: bold; color: #0A2342; width: 18%; }
+    .items { width: 100%; margin-top: 16px; }
+    .items th { background-color: #0A2342; color: #FFFFFF; padding: 6px 8px;
+                font-size: 8.5pt; text-align: left; border-bottom: 2px solid #B8860B; }
+    .items td { padding: 5px 8px; border-bottom: 1px solid #E8F0FB; font-size: 9pt; }
+    .num { text-align: right; }
+    .totales { margin-top: 10px; width: 45%; }
+    .totales td { padding: 5px 8px; border: 1px solid #E8F0FB; font-size: 9pt; }
+    .totales td.lbl { background-color: #E8F0FB; font-weight: bold; color: #0A2342; }
+    .totales td.final { background-color: #FDF8E8; font-weight: bold; font-size: 11pt; color: #B8860B; }
+    .nota { margin-top: 20px; padding: 8px 10px; border-left: 3px solid #4A90D9;
+            background-color: #F5F9FF; font-size: 8pt; color: #5A6A7E; }
+    #footer_content { font-size: 8pt; color: #5A6A7E; text-align: right; }
+</style>
+</head>
+<body>
+
+<table class="cabecera">
+    <tr>
+        {% if config.logo %}
+        <td width="70"><img src="{{ config.logo.url }}" width="56" height="56"></td>
+        {% endif %}
+        <td>
+            <div class="titulo">FACTURA</div>
+            <div class="empresa">{{ config.nombre_empresa }}</div>
+            {% if config.rfc %}<div class="empresa">RFC: {{ config.rfc }}</div>{% endif %}
+        </td>
+        <td class="folio">
+            No. {{ venta.pk|stringformat:"05d" }}<br>
+            <span class="empresa">{{ venta.fecha|date:"d/m/Y H:i" }} h</span>
+        </td>
+    </tr>
+</table>
+
+<table class="datos">
+    <tr>
+        <td class="lbl">Cliente</td><td>{{ venta.cliente.nombre }}</td>
+        <td class="lbl">Correo</td><td>{{ venta.cliente.correo }}</td>
+    </tr>
+    <tr>
+        <td class="lbl">Telefono</td><td>{{ venta.cliente.telefono|default:"-" }}</td>
+        <td class="lbl">Moneda</td><td>{{ config.moneda }}</td>
+    </tr>
+</table>
+
+<table class="items">
+    <thead>
+        <tr>
+            <th width="6%">#</th>
+            <th width="44%">Producto</th>
+            <th width="18%" class="num">Precio unit.</th>
+            <th width="12%" class="num">Cant.</th>
+            <th width="20%" class="num">Subtotal</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for detalle in venta.detalles.all %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ detalle.producto.nombre }}</td>
+            <td class="num">${{ detalle.precio_unitario }}</td>
+            <td class="num">{{ detalle.cantidad }}</td>
+            <td class="num">${{ detalle.subtotal }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" align="center">Sin lineas de detalle registradas.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<table class="totales" align="right">
+    <tr><td class="lbl">Subtotal (sin IVA)</td><td class="num">${{ subtotal }}</td></tr>
+    <tr><td class="lbl">IVA ({{ config.iva_porcentaje }}%)</td><td class="num">${{ iva }}</td></tr>
+    <tr><td class="lbl">TOTAL</td><td class="num final">${{ total_con_iva }}</td></tr>
+</table>
+
+<div style="clear:both;"></div>
+
+<div class="nota">
+    <strong>Nota:</strong> representacion de la factura generada por el sistema ERP Django
+    de {{ config.nombre_empresa }}. Generado el {{ hoy|date:"d/m/Y" }}.
+</div>
+
+<div id="footer_content">
+    {{ config.nombre_empresa }} &nbsp;|&nbsp; Pagina <pdf:pagenumber>
+</div>
+
+</body>
+</html>
