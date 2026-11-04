@@ -1,16 +1,11 @@
 # productos/views.py
-"""Vistas de la app productos — W07 + W08 + W12.
+"""Vistas de la app productos — W07 + W08.
 
 Lectura (W07): ListView y DetailView con select_related y paginación.
 Escritura (W08): CreateView, UpdateView y DeleteView con login.
-Exportación (W12): exportar_excel (openpyxl).
 """
-from datetime import date
-
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponse
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.urls import reverse_lazy
 from django.views.generic import (
     CreateView, DeleteView, DetailView, ListView, UpdateView
@@ -52,12 +47,16 @@ class ProductoDetailView(DetailView):
 
 
 class ProductoCreateView(LoginRequiredMixin, CreateView):
-    """Formulario para crear un nuevo producto."""
+    """Formulario para crear un nuevo producto.
+
+    LoginRequiredMixin PRIMERO en la herencia (obligatorio).
+    Redirige a /accounts/login/ si el usuario no está autenticado.
+    """
 
     model         = Producto
     form_class    = ProductoForm
     template_name = 'productos/crear.html'
-    success_url   = reverse_lazy('productos:lista')
+    success_url   = reverse_lazy('productos:lista')  # reverse_lazy (no reverse)
 
     def form_valid(self, form):
         """Agrega mensaje flash de éxito al guardar."""
@@ -87,13 +86,19 @@ class ProductoUpdateView(LoginRequiredMixin, UpdateView):
         return response
 
 
-class ProductoDeleteView(LoginRequiredMixin, DeleteView):
-    """Confirmación y borrado de un producto (solo POST)."""
+class ProductoDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+    """Confirmación y borrado de un producto.
+
+    SOLO acepta POST. El template debe incluir
+    un formulario con {% csrf_token %} para evitar CSRF.
+    """
 
     model         = Producto
     template_name = 'productos/eliminar.html'
     pk_url_kwarg  = 'producto_id'
     success_url   = reverse_lazy('productos:lista')
+    permission_required = 'productos.delete_producto'
+
 
     def form_valid(self, form):
         nombre   = self.object.nombre
@@ -103,6 +108,11 @@ class ProductoDeleteView(LoginRequiredMixin, DeleteView):
             f'Producto "{nombre}" eliminado.'
         )
         return response
+# ── Exportación a Excel — W12 ──────────────────────────────────────────────
+from datetime import date
+
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
 
 
 @login_required
@@ -160,4 +170,4 @@ def exportar_excel(request) -> HttpResponse:
         f'attachment; filename="inventario_{date.today():%Y%m%d}.xlsx"'
     )
     wb.save(respuesta)
-    return respuesta
+    return respuesta    
