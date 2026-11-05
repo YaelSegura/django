@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',       # ← nuevo (para OAuth futuro)
     'rest_framework',
     'rest_framework.authtoken',    # ← agregar
+    'django_filters',              # ← nuevo (el nombre de la app lleva guion bajo)
     'whitenoise.runserver_nostatic',
     # Apps del ERP
     'core',
@@ -37,6 +38,7 @@ INSTALLED_APPS = [
     'ventas',
     'reportes',
     'configuracion',
+    'catalogo',                    # ← nuevo    
 ]
 
 MIDDLEWARE = [
@@ -65,6 +67,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                # Context processor del carrito — W13
+                'catalogo.context_processors.carrito_info',                
             ],
         },
     },

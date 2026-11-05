@@ -631,6 +631,20 @@
            class="erp-nav-link {% block nav_ventas %}{% endblock %}">Ventas</a>
         <a href="{% url 'reportes:inicio' %}"
            class="erp-nav-link {% block nav_reportes %}{% endblock %}">Reportes</a>
+        <!-- En templates/base.html — dentro de erp-nav-links,
+     agregar ANTES del enlace "Admin": -->
+<a href="{% url 'catalogo:catalogo' %}"
+   class="erp-nav-link {% block nav_catalogo %}{% endblock %}">
+    🛒 Tienda
+</a>
+<!-- Contador del carrito en la navbar -->
+{% if carrito_total_items > 0 %}
+<a href="{% url 'catalogo:carrito' %}"
+   class="erp-nav-link"
+   style="position:relative;">
+    🛍️ ({{ carrito_total_items }})
+</a>
+{% endif %}           
         <a href="/admin/" class="erp-nav-link">Admin</a>
         {% if user.is_authenticated %}
             <a href="/accounts/logout/" class="erp-nav-link">
