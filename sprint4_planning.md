@@ -43,3 +43,27 @@ actualizando automáticamente el estado del pedido.
 | 9 tests de e-commerce | ✅ W13 |
 | Checkout con Stripe sandbox | ⏳ W14 |
 | Webhooks y estados de pedido | ⏳ W15 |
+## Sprint Backlog — actualización W14
+
+| Tarea | Estado |
+|---|---|
+| Catálogo + carrito + context processor | ✅ W13 |
+| pip install stripe | ✅ W14 |
+| STRIPE_* en settings.py (valores placeholder) | ✅ W14 |
+| checkout_utils.py (totales, items, cliente, número) | ✅ W14 |
+| CheckoutView (GET/POST) con PaymentIntent | ✅ W14 |
+| Template checkout.html con Stripe.js Card Element | ✅ W14 |
+| pago_exitoso: vaciar carrito + template | ✅ W14 |
+| pago_error: template con causas y reintento | ✅ W14 |
+| 10 tests con unittest.mock.patch | ✅ W14 |
+| Prueba manual con tarjeta Stripe sandbox | ⚠️ No realizada |
+| Webhooks + actualizar estado del pedido | ⏳ W15 |
+| Descontar stock al confirmar pago | ⏳ W15 |
+
+## Nota de desviación — cuenta de Stripe
+
+No se creó cuenta de Stripe, por lo que no hay claves reales de prueba.
+El flujo se verificó con pruebas automáticas que simulan la API
+(unittest.mock). No se pudo demostrar en vivo el criterio del Sprint
+"tarjeta 4242... → pedido pagado". Si Stripe falla, el pedido se marca
+"cancelado" y el usuario ve la pantalla de error.

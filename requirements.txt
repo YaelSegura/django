@@ -10,6 +10,7 @@ botocore==1.43.121
 certifi==2026.10.23
 cffi==2.1.1
 chardet==7.7.0
+charset-normalizer==3.5.2
 cryptography==50.0.2
 cssselect2==0.10.1
 dj-database-url==2.1.0
@@ -41,9 +42,11 @@ pypdf==6.21.4
 python-bidi==0.6.12
 python-dateutil==2.9.0.post0
 reportlab==4.0.9
+requests==2.34.2
 s3transfer==0.19.3
 six==1.17.0
 sqlparse==0.6.0
+stripe==7.8.0
 svglib==1.5.1
 tinycss2==1.5.1
 typing_extensions==4.16.0

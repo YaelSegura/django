@@ -27,7 +27,20 @@ from productos.models import Producto
 
 from .filters import ProductoFilter
 
+import stripe
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
 
+from ventas.models import Pedido
+from .checkout_utils import (
+    calcular_totales,
+    construir_items,
+    generar_numero_pedido,
+    obtener_o_crear_cliente,
+)
+
+# Configurar la clave secreta de Stripe
+stripe.api_key = settings.STRIPE_SECRET_KEY
 # ── CATÁLOGO ───────────────────────────────────────────────────────────────
 
 class CatalogoView(ListView):
@@ -210,3 +223,126 @@ def vaciar_carrito(request):
         _guardar_carrito(request, {})
         messages.info(request, 'Carrito vaciado.')
     return redirect('catalogo:carrito')
+# ── CHECKOUT — W14 ─────────────────────────────────────────────────────────
+
+def _cancelar_pedido(pedido) -> None:
+    """Marca como cancelado un pedido cuyo pago no pudo iniciarse.
+
+    Evita que queden pedidos 'pendiente' huérfanos cuando Stripe falla.
+    """
+    if pedido is not None and pedido.pk:
+        pedido.estado = 'cancelado'
+        pedido.save(update_fields=['estado'])
+
+
+@login_required
+def checkout(request):
+    """Proceso de pago: muestra resumen y crea PaymentIntent de Stripe.
+
+    GET:  Muestra resumen del carrito con IVA calculado.
+          No crea PaymentIntent (espera a POST).
+
+    POST: Valida carrito → crea Pedido → crea PaymentIntent →
+          retorna client_secret al template para que Stripe.js
+          confirme el pago del lado del cliente.
+
+    Redirige a /catalogo/ si el carrito está vacío.
+    """
+    carrito = _obtener_carrito(request)
+    if not carrito:
+        messages.warning(request, 'Tu carrito está vacío.')
+        return redirect('catalogo:catalogo')
+
+    totales         = calcular_totales(carrito)
+    items           = construir_items(carrito)
+    publishable_key = settings.STRIPE_PUBLISHABLE_KEY
+
+    if request.method == 'POST':
+        pedido = None
+        try:
+            # ── 1. Vincular usuario con Cliente del ERP ────────────────
+            cliente = obtener_o_crear_cliente(request.user)
+
+            # ── 2. Crear el Pedido en estado "pendiente" ───────────────
+            numero = generar_numero_pedido()
+            pedido = Pedido.objects.create(
+                numero_pedido = numero,
+                cliente       = cliente,
+                estado        = 'pendiente',
+                total_pagado  = totales['total'],
+            )
+
+            # ── 3. Crear PaymentIntent en Stripe ───────────────────────
+            # Monto en centavos (Stripe requiere entero)
+            monto_centavos = int(totales['total'] * 100)
+
+            intent = stripe.PaymentIntent.create(
+                amount          = monto_centavos,
+                currency        = 'mxn',
+                metadata        = {
+                    'pedido_id':  pedido.pk,
+                    'pedido_num': pedido.numero_pedido,
+                    'cliente':    cliente.nombre,
+                },
+                idempotency_key = f'pedido-{pedido.pk}',
+            )
+
+            # ── 4. Retornar client_secret al template ──────────────────
+            return render(request, 'catalogo/checkout.html', {
+                'items':           items,
+                'totales':         totales,
+                'pedido':          pedido,
+                'client_secret':   intent.client_secret,
+                'publishable_key': publishable_key,
+            })
+
+        except stripe.error.StripeError as exc:
+            _cancelar_pedido(pedido)
+            detalle = exc.user_message or 'no se pudo procesar el pago'
+            messages.error(
+                request,
+                f'Error al conectar con Stripe: {detalle}'
+            )
+            return redirect('catalogo:pago_error')
+
+        except Exception:
+            _cancelar_pedido(pedido)
+            messages.error(
+                request,
+                'Error inesperado en el proceso de pago.'
+            )
+            return redirect('catalogo:pago_error')
+
+    # GET — solo mostrar resumen (sin PaymentIntent)
+    return render(request, 'catalogo/checkout.html', {
+        'items':           items,
+        'totales':         totales,
+        'client_secret':   None,          # se genera en POST
+        'publishable_key': publishable_key,
+    })
+
+
+def pago_exitoso(request, pedido_id: int):
+    """Vista de confirmación post-pago exitoso.
+
+    Vacía el carrito de la sesión y muestra el número de pedido.
+    Stripe.js redirige aquí después de `confirmCardPayment` exitoso.
+    """
+    pedido = get_object_or_404(Pedido, pk=pedido_id)
+
+    # Vaciar el carrito al confirmar el pago
+    _guardar_carrito(request, {})
+    messages.success(
+        request,
+        f'¡Pago exitoso! Tu pedido {pedido.numero_pedido} '
+        f'está confirmado. Total: ${pedido.total_pagado}'
+    )
+
+    return render(request, 'catalogo/pago_exitoso.html', {
+        'pedido': pedido,
+    })
+
+
+def pago_error(request):
+    """Vista de error de pago — muestra mensaje y permite reintentar."""
+    return render(request, 'catalogo/pago_error.html')
