@@ -26,7 +26,7 @@ from django.views.generic import ListView
 from productos.models import Producto
 
 from .filters import ProductoFilter
-
+import logging
 import stripe
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -34,13 +34,14 @@ from django.contrib.auth.decorators import login_required
 from ventas.models import Pedido
 from .checkout_utils import (
     calcular_totales,
-    construir_items,
+    armar_items,
     generar_numero_pedido,
     obtener_o_crear_cliente,
 )
 
 # Configurar la clave secreta de Stripe
 stripe.api_key = settings.STRIPE_SECRET_KEY
+logger = logging.getLogger(__name__)
 # ── CATÁLOGO ───────────────────────────────────────────────────────────────
 
 class CatalogoView(ListView):
@@ -254,7 +255,7 @@ def checkout(request):
         return redirect('catalogo:catalogo')
 
     totales         = calcular_totales(carrito)
-    items           = construir_items(carrito)
+    items           = armar_items(carrito)
     publishable_key = settings.STRIPE_PUBLISHABLE_KEY
 
     if request.method == 'POST':
@@ -306,6 +307,7 @@ def checkout(request):
             return redirect('catalogo:pago_error')
 
         except Exception:
+            logger.exception('Fallo inesperado en el checkout')
             _cancelar_pedido(pedido)
             messages.error(
                 request,

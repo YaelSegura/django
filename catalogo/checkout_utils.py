@@ -40,30 +40,8 @@ def calcular_totales(carrito: dict) -> dict:
         'iva_monto': iva_monto,
         'total':     total,
     }
-def construir_items(carrito: dict) -> list:
-    """Convierte el carrito de sesión en una lista lista para el template.
 
-    Calcula el subtotal de cada línea como Decimal. Esto reemplaza el
-    uso de {% widthratio %} en el template, que falla con precios
-    guardados como texto ("500.00").
-
-    Returns:
-        Lista de dicts con prod_id, nombre, cantidad, precio y subtotal.
-    """
-    items = []
-    for prod_id, datos in carrito.items():
-        precio   = Decimal(datos['precio'])
-        cantidad = int(datos['cantidad'])
-        items.append({
-            'prod_id':  prod_id,
-            'nombre':   datos['nombre'],
-            'cantidad': cantidad,
-            'precio':   precio,
-            'subtotal': precio * cantidad,
-        })
-    return items
-
-def construir_items(carrito: dict) -> list:
+def armar_items(carrito: dict) -> list:
     """Convierte el carrito de sesión en una lista lista para el template.
 
     Calcula el subtotal de cada línea como Decimal. Esto reemplaza el

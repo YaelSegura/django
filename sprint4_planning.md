@@ -41,7 +41,7 @@ actualizando automáticamente el estado del pedido.
 | Template carrito.html con tabla | ✅ W13 |
 | Contador carrito en navbar base.html | ✅ W13 |
 | 9 tests de e-commerce | ✅ W13 |
-| Checkout con Stripe sandbox | ⏳ W14 |
+| Checkout con Stripe sandbox | ✅ W14 |
 | Webhooks y estados de pedido | ⏳ W15 |
 ## Sprint Backlog — actualización W14
 
@@ -67,3 +67,4 @@ El flujo se verificó con pruebas automáticas que simulan la API
 (unittest.mock). No se pudo demostrar en vivo el criterio del Sprint
 "tarjeta 4242... → pedido pagado". Si Stripe falla, el pedido se marca
 "cancelado" y el usuario ve la pantalla de error.
+Prueba manual realizada con tarjeta 4242... en sandbox de Stripe: pedido PED-2026-0017 creado en estado "pendiente" y carrito vaciado tras el pago.
