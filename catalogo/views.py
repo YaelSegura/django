@@ -264,7 +264,7 @@ def checkout(request):
             # ── 1. Vincular usuario con Cliente del ERP ────────────────
             cliente = obtener_o_crear_cliente(request.user)
 
-                        # ── 2. Crear el Pedido con snapshot del carrito ────────────
+            # ── 2. Crear el Pedido con snapshot del carrito ────────────
             numero = generar_numero_pedido()
 
             # Construir el snapshot: lista de dicts serializables
@@ -285,7 +285,6 @@ def checkout(request):
                 total_pagado   = totales['total'],
                 items_snapshot = snapshot,           # ← nuevo
             )
-
             # ── 3. Crear PaymentIntent en Stripe ───────────────────────
             # Monto en centavos (Stripe requiere entero)
             monto_centavos = int(totales['total'] * 100)
