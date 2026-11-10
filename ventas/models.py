@@ -187,7 +187,12 @@ class Pedido(models.Model):
         validators=[MinValueValidator(Decimal('0.00'))],  # ← agregar
         verbose_name='Total pagado'
     )
-
+    items_snapshot = models.JSONField(
+        default=list,
+        blank=True,
+        verbose_name='Snapshot de items del carrito',
+        help_text='Copia del carrito al momento de crear el pedido.'
+    )
     class Meta:
         verbose_name        = 'Pedido'
         verbose_name_plural = 'Pedidos'

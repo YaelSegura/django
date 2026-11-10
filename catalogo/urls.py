@@ -1,7 +1,7 @@
 # catalogo/urls.py — versión W14
 """URLs del módulo catálogo — W14."""
 from django.urls import path
-
+from .webhook_views import stripe_webhook  # <--- Agrega este import arriba
 from . import views
 
 app_name = 'catalogo'
@@ -39,4 +39,5 @@ urlpatterns = [
     path('pago-error/',
          views.pago_error,
          name='pago_error'),
+    path('webhook/', stripe_webhook, name='webhook'),         
 ]
