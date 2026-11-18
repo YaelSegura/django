@@ -108,3 +108,7 @@ if _bucket:
     AWS_S3_FILE_OVERWRITE = False       # no sobreescribir si el nombre ya existe
     AWS_QUERYSTRING_AUTH  = False       # URLs públicas (sin firma)
     MEDIA_URL             = f'https://{_bucket}.s3.amazonaws.com/'
+# W17: SendGrid solo si hay API key configurada en Render
+import os
+if os.environ.get('SENDGRID_API_KEY'):
+    EMAIL_BACKEND = 'anymail.backends.sendgrid.EmailBackend'    

@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'allauth.account',             # ← nuevo
     'allauth.socialaccount',       # ← nuevo (para OAuth futuro)
     'rest_framework',
+    'anymail',
     'rest_framework.authtoken',    # ← agregar
     'django_filters',              # ← nuevo (el nombre de la app lleva guion bajo)
     'whitenoise.runserver_nostatic',
@@ -273,3 +274,20 @@ CELERY_TASK_DEFAULT_QUEUE = 'erp_django'
 # @override_settings(CELERY_TASK_ALWAYS_EAGER=True).
 CELERY_TASK_ALWAYS_EAGER     = env.bool('CELERY_TASK_ALWAYS_EAGER', default=False)
 CELERY_TASK_EAGER_PROPAGATES = True
+# ── CORREO ELECTRÓNICO (W17) ──────────────────────────────────────────────
+EMAIL_BACKEND = env(
+    'EMAIL_BACKEND',
+    default='django.core.mail.backends.console.EmailBackend'
+)
+DEFAULT_FROM_EMAIL = env(
+    'DEFAULT_FROM_EMAIL',
+    default='ERP Django <noreply@erp-django.com>'
+)
+EMAIL_SUBJECT_PREFIX = '[ERP Django] '
+ADMINS = [
+    ('Admin ERP', env('ADMIN_EMAIL', default='admin@erp-django.com')),
+]
+SENDGRID_API_KEY = env('SENDGRID_API_KEY', default='')
+ANYMAIL = {
+    'SENDGRID_API_KEY': SENDGRID_API_KEY,
+}
