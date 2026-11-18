@@ -1,7 +1,4 @@
-# docker-compose.yml
-# Uso: docker-compose up --build
-# Requiere Docker Desktop instalado en la PC
-
+# docker-compose.yml — versión W16 completa
 version: '3.9'
 
 services:
@@ -24,12 +21,17 @@ services:
       timeout: 5s
       retries: 5
 
-  # ── Cache Redis (preparado para Celery en W16) ─────────────────────
+  # ── Broker de mensajes Redis ────────────────────────────────────────
   redis:
     image: redis:7-alpine
     restart: unless-stopped
     ports:
       - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
   # ── Aplicación Django ───────────────────────────────────────────────
   web:
@@ -48,6 +50,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
       DJANGO_SETTINGS_MODULE: core.settings_prod
       SECRET_KEY:             dev-clave-docker-no-usar-en-produccion
@@ -55,8 +59,24 @@ services:
       DATABASE_URL:           postgres://erp_user:erp_pass_local@db:5432/erp_db
       REDIS_URL:              redis://redis:6379/0
       ALLOWED_HOSTS:          localhost,127.0.0.1
+      STRIPE_SECRET_KEY:      sk_test_placeholder
+      STRIPE_PUBLISHABLE_KEY: pk_test_placeholder
+      STRIPE_WEBHOOK_SECRET:  whsec_placeholder
 
-volumes:
-  postgres_data:
-  static_volume:
-  media_volume:
+  # ── Worker de Celery — W16 ──────────────────────────────────────────
+  celery_worker:
+    build: .
+    restart: unless-stopped
+    command: celery -A core worker -l info -Q erp_django
+    volumes:
+      - .:/app
+    depends_on:
+      redis:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+    environment:
+      DJANGO_SETTINGS_MODULE: core.settings_prod
+      SECRET_KEY:             dev-clave-docker-no-usar-en-produccion
+      DATABASE_URL:           postgres://erp_user:erp_pass_local@db:5432/erp_db
+      REDIS_URL:

@@ -8,7 +8,7 @@ from django.views.decorators.http import require_POST
 
 from productos.models import Producto
 from ventas.models    import Pedido
-
+from ventas.tasks import enviar_confirmacion_pedido
 logger = logging.getLogger(__name__)
 
 @csrf_exempt
@@ -47,6 +47,20 @@ def stripe_webhook(request) -> HttpResponse:
 
     return HttpResponse(status=200)
 
+def _encolar_confirmacion(pedido_id: int) -> None:
+    """Encola la tarea de confirmación sin romper la respuesta al webhook.
+
+    Si Redis no está disponible, registra un aviso y devuelve normalmente.
+    El webhook debe responder 200 aunque falle el correo; si respondiera
+    un error, Stripe reintentaría el evento.
+    """
+    try:
+        enviar_confirmacion_pedido.delay(pedido_id)
+    except Exception as exc:
+        logger.warning(
+            'No se pudo encolar la confirmación del pedido %s: %s',
+            pedido_id, exc
+        )
 
 def _manejar_pago_exitoso(payment_intent: dict) -> None:
     pedido_id = _extraer_pedido_id(payment_intent)
@@ -64,7 +78,14 @@ def _manejar_pago_exitoso(payment_intent: dict) -> None:
         pedido.estado = 'pagado'
         pedido.save(update_fields=['estado'])
         logger.info(f'Pedido {pedido.numero_pedido} actualizado a "pagado".')
+                # Descontar stock de cada producto del snapshot
         _descontar_stock(pedido)
+
+        # ── NUEVO W16: disparar tarea de confirmación ─────────────────
+        # El webhook es el lugar más confiable para disparar el correo:
+        # se ejecuta incluso si el usuario cerró el navegador antes de
+        # llegar a pago_exitoso().
+        _encolar_confirmacion(pedido.pk)
 
 def _manejar_pago_fallido(payment_intent: dict) -> None:
     pedido_id = _extraer_pedido_id(payment_intent)

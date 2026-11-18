@@ -32,6 +32,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 
 from ventas.models import Pedido
+from ventas.tasks import enviar_confirmacion_pedido
 from .checkout_utils import (
     calcular_totales,
     armar_items,
@@ -336,26 +337,61 @@ def checkout(request):
     })
 
 
-def pago_exitoso(request, pedido_id: int):
-    """Vista de confirmación post-pago exitoso.
+def _encolar_confirmacion(pedido_id: int) -> None:
+    """Encola la tarea de confirmación sin romper el flujo de pago.
 
-    Vacía el carrito de la sesión y muestra el número de pedido.
-    Stripe.js redirige aquí después de `confirmCardPayment` exitoso.
+    Si el broker (Redis) no está disponible, registra un aviso y
+    continúa: el pago ya se completó y no debe fallar por el correo.
+    """
+    try:
+        enviar_confirmacion_pedido.delay(pedido_id)
+    except Exception as exc:
+        logger.warning(
+            'No se pudo encolar la confirmación del pedido %s: %s',
+            pedido_id, exc
+        )
+
+
+def _encolar_confirmacion(pedido_id: int) -> None:
+    """Encola la tarea de confirmación sin romper el flujo de pago.
+
+    Si el broker (Redis) no está disponible, registra un aviso y
+    continúa: el pago ya se completó y no debe fallar por el correo.
+    """
+    try:
+        enviar_confirmacion_pedido.delay(pedido_id)
+    except Exception as exc:
+        logger.warning(
+            'No se pudo encolar la confirmación del pedido %s: %s',
+            pedido_id, exc
+        )
+
+
+def pago_exitoso(request, pedido_id: int):
+    """Vista de confirmación post-pago exitoso — W16.
+
+    Cambios respecto a W14:
+        Dispara la tarea asíncrona de confirmación con .delay().
+        La tarea se encola en Redis y el worker la procesa
+        en segundo plano, sin bloquear esta respuesta HTTP.
     """
     pedido = get_object_or_404(Pedido, pk=pedido_id)
 
-    # Vaciar el carrito al confirmar el pago
+    # Vaciar el carrito de la sesión
     _guardar_carrito(request, {})
+
+    # ── NUEVO W16: disparar tarea asíncrona de confirmación ───────────
+    _encolar_confirmacion(pedido.pk)
+
     messages.success(
         request,
         f'¡Pago exitoso! Tu pedido {pedido.numero_pedido} '
-        f'está confirmado. Total: ${pedido.total_pagado}'
+        f'está confirmado. Recibirás un correo de confirmación pronto.'
     )
 
     return render(request, 'catalogo/pago_exitoso.html', {
         'pedido': pedido,
     })
-
 
 def pago_error(request):
     """Vista de error de pago — muestra mensaje y permite reintentar."""

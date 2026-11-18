@@ -243,3 +243,33 @@ ACCOUNT_EMAIL_REQUIRED     = False
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 ACCOUNT_LOGOUT_ON_GET      = True
 ACCOUNT_SESSION_REMEMBER   = True
+# ── CELERY — Cola de tareas asíncronas ────────────────────────────────────
+# Broker: Redis almacena los mensajes de las tareas pendientes
+CELERY_BROKER_URL = env('REDIS_URL', default='redis://localhost:6379/0')
+
+# Backend: Redis almacena los resultados de las tareas (opcional)
+CELERY_RESULT_BACKEND = env('REDIS_URL', default='redis://localhost:6379/0')
+
+# Formato de serialización (JSON es seguro y portable)
+CELERY_ACCEPT_CONTENT    = ['json']
+CELERY_TASK_SERIALIZER   = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+
+# Zona horaria (heredar de Django)
+CELERY_TIMEZONE = TIME_ZONE   # 'America/Mexico_City'
+
+# Reintentos automáticos ante fallos de conexión al broker
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+
+# Tiempo máximo que puede correr una tarea antes de ser terminada (segundos)
+CELERY_TASK_SOFT_TIME_LIMIT = 300   # 5 minutos
+CELERY_TASK_TIME_LIMIT       = 360  # 6 minutos (hard limit)
+
+# Prefijo para las colas (útil si se comparte Redis entre proyectos)
+CELERY_TASK_DEFAULT_QUEUE = 'erp_django'
+
+# Modo "eager": ejecuta las tareas en el mismo proceso, sin worker ni Redis.
+# Por defecto False (producción). En tests se activa con
+# @override_settings(CELERY_TASK_ALWAYS_EAGER=True).
+CELERY_TASK_ALWAYS_EAGER     = env.bool('CELERY_TASK_ALWAYS_EAGER', default=False)
+CELERY_TASK_EAGER_PROPAGATES = True
