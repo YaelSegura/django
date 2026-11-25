@@ -61,40 +61,41 @@ class DetalleVentaAdmin(admin.ModelAdmin):
 
 @admin.register(Pedido)
 class PedidoAdmin(admin.ModelAdmin):
-    """Admin de pedidos de e-commerce."""
-
-
     list_display   = ['numero_pedido', 'cliente', 'estado',
                       'fecha_pedido', 'total_pagado', 'correo_enviado']
     search_fields  = ['numero_pedido', 'cliente__nombre']
     list_filter    = ['estado', 'correo_enviado']
     readonly_fields = ['fecha_pedido']
-    actions        = ['reenviar_confirmacion']
-
+    
+    # Agregamos las dos acciones
+    actions        = ['reenviar_confirmacion', 'enviar_reporte_manual']
 
     @admin.action(description='Enviar correo de confirmación (pagados sin correo)')
     def reenviar_confirmacion(self, request, queryset):
-        """Encola el correo de los pedidos pagados que aún no lo recibieron.
-
-
-        Útil si el envío falló (p. ej. Redis/Resend caídos): Render Free
-        no tiene Shell. La tarea es idempotente (correo_enviado).
-        """
+        # ... (tu código actual de reenviar_confirmacion) ...
         pendientes = queryset.filter(estado='pagado', correo_enviado=False)
         encolados, errores = 0, 0
         for pedido in pendientes:
             try:
-                enviar_confirmacion_pedido.delay(pedido.pk)
+                from ventas.tasks import enviar_confirmacion_pedido
+                enviar_confirmacion_pedido.apply(args=[pedido.pk]) # Usamos apply
                 encolados += 1
-            except Exception as exc:   # Redis caído, etc.
+            except Exception as exc:
                 errores += 1
-                self.message_user(
-                    request, f'{pedido.numero_pedido}: {exc}', messages.ERROR
-                )
+                self.message_user(request, f'{pedido.numero_pedido}: {exc}', messages.ERROR)
         omitidos = queryset.count() - pendientes.count()
-        self.message_user(
-            request,
-            f'Correos encolados: {encolados}. Errores: {errores}. '
-            f'Omitidos (no pagados o ya enviados): {omitidos}.',
-            messages.SUCCESS if not errores else messages.WARNING,
-        )
+        self.message_user(request, f'Correos encolados: {encolados}. Errores: {errores}. Omitidos: {omitidos}.', messages.SUCCESS if not errores else messages.WARNING)
+
+    @admin.action(description='Enviar REPORTE DIARIO de ventas (Prueba manual)')
+    def enviar_reporte_manual(self, request, queryset):
+        from ventas.tasks import reporte_ventas_diario
+        try:
+            # Ejecutamos la tarea síncronamente
+            resultado = reporte_ventas_diario.apply().get()
+            self.message_user(
+                request, 
+                f"Reporte enviado con éxito. Pedidos hoy: {resultado['total_pedidos']}, Facturado: ${resultado['total_facturado']}", 
+                messages.SUCCESS
+            )
+        except Exception as exc:
+            self.message_user(request, f"Error al enviar reporte: {exc}", messages.ERROR)
