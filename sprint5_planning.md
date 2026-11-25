@@ -52,3 +52,25 @@ stock bajo y reporte diario de ventas.
    la tarea (la guía usaba widthratio y una ruta de ventas incorrecta).
 6. Incidente de entorno: archivos de env_erp se corrompieron al copiarse
    entre la USB y C:; se creó un entorno nuevo desde requirements.txt.
+   ## Sprint Backlog — actualización W18
+
+| Tarea | Estado |
+|---|---|
+| reporte_ventas_diario: annotate + Sum(F('cantidad') * F('precio_unitario')) | ✅ W18 |
+| Top 5 incluye compras en línea (Pedido.items_snapshot) | ✅ W18 |
+| Templates reporte_ventas.html + .txt (KPIs + tabla) | ✅ W18 |
+| CELERY_BEAT_SCHEDULE: reporte crontab(06:50) + stock timedelta(hours=1) | ✅ W18 |
+| Hora configurable REPORTE_DIARIO_HORA (Render: 10:00 para pruebas) | ✅ W18 |
+| Fix kombu 5.7.0 → 5.3.7 (VersionMismatch con redis 5.0.1) | ✅ W18 |
+| Acción admin "Enviar correo de confirmación" (pagados sin correo) | ✅ W18 |
+| Suite completa en verde (186 tests) | ✅ W18 |
+
+## Hito M6 — ALCANZADO ✅
+- Worker: embebido en el contenedor web de Render (`--pool=solo`)
+- Beat: embebido en el worker (`--beat`), una sola instancia
+- Correo: enviar_confirmacion_pedido → solo desde el webhook, idempotente
+- Alerta: verificar_stock_bajo → cada hora, correo al admin
+- Reporte: crontab(hour=6, minute=50) → 6:50 AM hora de México
+  (configurable con REPORTE_DIARIO_HORA)
+- Tests: Ran 186 tests → OK (2 skipped: PDF requiere GTK, corre en Docker/Render)
+- Fecha: 24/Noviembre/2026
