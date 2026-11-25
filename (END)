@@ -1,0 +1,37 @@
+[1mdiff --git a/sprint5_planning.md b/sprint5_planning.md[m
+[1mindex 4f4850a..a562229 100644[m
+[1m--- a/sprint5_planning.md[m
+[1m+++ b/sprint5_planning.md[m
+[36m@@ -55,4 +55,29 @@[m [mstock bajo y reporte diario de ventas.[m
+    depender de Redis. Total acumulado: 174.[m
+ 5. **Botón del correo:** apunta al catálogo (la guía apuntaba a una ruta[m
+    de ventas que no corresponde a pedidos). Subtotales calculados en la[m
+[31m-   tarea en lugar de widthratio.[m
+\ No newline at end of file[m
+[32m+[m[32m   tarea en lugar de widthratio.[m
+[32m+[m[32m   ## Sprint Backlog — actualización W17[m
+[32m+[m
+[32m+[m[32m| Tarea | Estado |[m
+[32m+[m[32m|---|---|[m
+[32m+[m[32m| django-anymail[sendgrid] instalado | ✅ W17 |[m
+[32m+[m[32m| EMAIL_BACKEND: consola en desarrollo; SendGrid solo si hay SENDGRID_API_KEY | ✅ W17 |[m
+[32m+[m[32m| correo_enviado en Pedido + migración 0005 | ✅ W17 |[m
+[32m+[m[32m| Templates confirmacion_pedido y alerta_stock (.html y .txt) | ✅ W17 |[m
+[32m+[m[32m| enviar_confirmacion_pedido con idempotencia | ✅ W17 |[m
+[32m+[m[32m| verificar_stock_bajo con alerta al administrador | ✅ W17 |[m
+[32m+[m[32m| 9 tests con mail.outbox (174 en total) | ✅ W17 |[m
+[32m+[m[32m| Celery Beat + tareas programadas | ⏳ W18 |[m
+[32m+[m
+[32m+[m[32m### Desviaciones y pendientes W17 (informar al asesor)[m
+[32m+[m
+[32m+[m[32m1. SendGrid ya no tiene plan gratuito permanente: se usa la prueba de[m
+[32m+[m[32m   Twilio SendGrid (termina el 17/01/2027). Remitente único verificado.[m
+[32m+[m[32m2. Redis/worker no disponibles en Render gratis: en producción las tareas[m
+[32m+[m[32m   se ejecutan en modo eager (CELERY_TASK_ALWAYS_EAGER=True).[m
+[32m+[m[32m3. Migración: 0005_correo_enviado_pedido (la guía decía 0004, ya existía).[m
+[32m+[m[32m4. Tests: son 9 (no 8); las tareas se prueban con .apply(). Total: 174.[m
+[32m+[m[32m5. El botón del correo apunta al catálogo y los subtotales se calculan en[m
+[32m+[m[32m   la tarea (la guía usaba widthratio y una ruta de ventas incorrecta).[m
+[32m+[m[32m6. Incidente de entorno: archivos de env_erp se corrompieron al copiarse[m
+[32m+[m[32m   entre la USB y C:; se creó un entorno nuevo desde requirements.txt.[m
+\ No newline at end of file[m
