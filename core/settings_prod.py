@@ -111,6 +111,7 @@ if _bucket:
 # W17 y W18: Configuración para Render
 import os
 
+# SendGrid
 _sendgrid_key = os.environ.get('SENDGRID_API_KEY', '').strip()
 if _sendgrid_key:
     SENDGRID_API_KEY = _sendgrid_key
@@ -119,9 +120,8 @@ if _sendgrid_key:
 else:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-# Forzar modo EAGER si está configurado en Render
-_eager = os.environ.get('CELERY_TASK_ALWAYS_EAGER', 'False').lower()
-CELERY_TASK_ALWAYS_EAGER = _eager in ('true', '1', 'yes')
+# Forzar modo EAGER SIEMPRE en Render (no hay Redis en plan gratuito)
+CELERY_TASK_ALWAYS_EAGER = True
 
 if os.environ.get('DEFAULT_FROM_EMAIL'):
     DEFAULT_FROM_EMAIL = os.environ['DEFAULT_FROM_EMAIL']
