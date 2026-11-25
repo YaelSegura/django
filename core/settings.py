@@ -176,11 +176,11 @@ ANYMAIL = {
 
 # ── JAZZMIN — Personalización del admin ───────────────────────────────────
 JAZZMIN_SETTINGS = {
-    'site_title':       "Dongu's Admin",
-    'site_header':      "Dongu's",
-    'site_brand':       "Dongu's",
-    'welcome_sign':     'Dongu',
-    'copyright':        'Ramses Oswaldo Dongu Martinez',
+    'site_title':       "YS Empire Admin",
+    'site_header':      "YS Empire",
+    'site_brand':       "YS Empire",
+    'welcome_sign':     'Bienvenido a YS Empire',
+    'copyright':        'Yael Segura',
     'site_icon':        None,
     'site_logo':        None,
     'search_model':     ['clientes.Cliente', 'productos.Producto'],
