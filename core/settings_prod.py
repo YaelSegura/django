@@ -108,7 +108,7 @@ if _bucket:
     AWS_S3_FILE_OVERWRITE = False       # no sobreescribir si el nombre ya existe
     AWS_QUERYSTRING_AUTH  = False       # URLs públicas (sin firma)
     MEDIA_URL             = f'https://{_bucket}.s3.amazonaws.com/'
-# W17: Configuración explícita de SendGrid y Celery para Render
+# W17 y W18: Configuración para Render
 import os
 
 _sendgrid_key = os.environ.get('SENDGRID_API_KEY', '').strip()
@@ -117,15 +117,13 @@ if _sendgrid_key:
     ANYMAIL = {'SENDGRID_API_KEY': _sendgrid_key}
     EMAIL_BACKEND = 'anymail.backends.sendgrid.EmailBackend'
 else:
-    # Si no hay clave, usar consola para que no falle
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Forzar modo EAGER si está configurado en Render
 _eager = os.environ.get('CELERY_TASK_ALWAYS_EAGER', 'False').lower()
 CELERY_TASK_ALWAYS_EAGER = _eager in ('true', '1', 'yes')
 
-# Forzar el remitente y admin si están en el entorno
 if os.environ.get('DEFAULT_FROM_EMAIL'):
     DEFAULT_FROM_EMAIL = os.environ['DEFAULT_FROM_EMAIL']
 if os.environ.get('ADMIN_EMAIL'):
-    ADMINS = [('Admin ERP', os.environ['ADMIN_EMAIL'])] 
+    ADMINS = [('Admin ERP', os.environ['ADMIN_EMAIL'])]
